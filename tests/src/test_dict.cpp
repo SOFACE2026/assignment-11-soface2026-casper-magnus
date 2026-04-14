@@ -25,4 +25,30 @@ TEST_CASE("Test Dict")
     REQUIRE_THAT(name_to_age.values(), UnorderedEquals(std::vector<int>{20}));
 
     name_to_age.set("Tarzan", 25);
+    REQUIRE(name_to_age.len() == 2);
+    REQUIRE(name_to_age.has("Tarzan"));
+    REQUIRE(name_to_age.get("Tarzan").has_value());
+    REQUIRE(name_to_age.get("Tarzan").value() == 25);
+    REQUIRE_THAT(name_to_age.keys(), UnorderedEquals(std::vector<std::string>{"Jane", "Tarzan"}));
+    REQUIRE_THAT(name_to_age.values(), UnorderedEquals(std::vector<int>{20, 25}));
+
+    // Test overwrite existing key
+    name_to_age.set("Jane", 21);
+    REQUIRE(name_to_age.len() == 2);
+    REQUIRE(name_to_age.get("Jane").value() == 21);
+
+    // Test get non-existent key
+    REQUIRE_FALSE(name_to_age.get("Batman").has_value());
+
+    // Test has non-existent key
+    REQUIRE_FALSE(name_to_age.has("Batman"));
+
+    // Test delete existing key
+    name_to_age.del("Jane");
+    REQUIRE(name_to_age.len() == 1);
+    REQUIRE_FALSE(name_to_age.has("Jane"));
+
+    // Test delete non-existent key
+    name_to_age.del("Batman");
+    REQUIRE(name_to_age.len() == 1);
 }

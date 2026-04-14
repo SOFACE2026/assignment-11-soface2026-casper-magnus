@@ -15,6 +15,10 @@
 template <class K, class V>
 class Dict
 {
+private:
+    // Vi gemmer vores data som en vektor af "par" (std::pair).
+    // Hvert par indeholder en nøgle (K) og en tilhørende værdi (V).
+    std::vector<std::pair<K, V>> data;
 
 public:
     /**
@@ -26,6 +30,18 @@ public:
      */
     void set(K key, V val)
     {
+        // Vi kører igennem alle par i vores data-vektor (som referencer for at kunne ændre dem).
+        for (auto& pair : data) {
+            // Hvis vi finder et par, hvor nøglen (pair.first) allerede findes...
+            if (pair.first == key) {
+                // ...så overskriver vi bare værdien (pair.second) med den nye.
+                pair.second = val;
+                return; // Afslut funktionen herindefra
+            }
+        }
+        // Hvis vi har kigget hele listen igennem uden at finde nøglen,
+        // tilføjer vi et helt nyt nøgle-værdi par i bunden af vektoren.
+        data.push_back({key, val});
     }
 
     /**
@@ -37,7 +53,11 @@ public:
      */
     bool has(K key) const
     {
-        return false;
+        // std::any_of er en genvej til at lede efter noget i en liste.
+        // Den returnerer 'true' hvis betingelsen i lambda-funktionen er sand for mindst ét element.
+        return std::any_of(data.begin(), data.end(), [&key](const auto& pair) {
+            return pair.first == key; // Sammenligner nøglen med eksisterende nøgler
+        });
     }
 
     /**
@@ -45,9 +65,10 @@ public:
      * 
      * @return the number of items in the dictionary.
      */
-    size_t len()
+    size_t len() const
     {
-        return 0;
+        // Returnerer blot hvor mange par der aktuelt er gemt i vores vektor.
+        return data.size();
     }
 
     /**
@@ -59,7 +80,15 @@ public:
      */
     std::optional<V> get(K key) const
     {
-        return {};
+        // Kører igennem alle par i vores ordbog.
+        for (const auto& pair : data) {
+            // Hvis vi finder den efterspurgte nøgle:
+            if (pair.first == key) {
+                return pair.second; // Returner dens tilhørende værdi.
+            }
+        }
+        // Hvis vi når hertil, fandtes nøglen ikke. Så returnerer vi std::nullopt (viser at der ingen værdi er).
+        return std::nullopt;
     }
 
     /**
@@ -72,6 +101,17 @@ public:
      */
     void del(K key)
     {
+        // std::remove_if flytter alle de elementer der matcher (vores søgte nøgle) 
+        // bagest i vektoren og returnerer en iterator (en slags markør) til starten af dem.
+        auto it = std::remove_if(data.begin(), data.end(), [&key](const auto& pair) {
+            return pair.first == key;
+        });
+        
+        // Hvis der faktisk blev fundet og flyttet noget...
+        if (it != data.end()) {
+            // ...så sletter vi dem permanent fra vektoren.
+            data.erase(it, data.end());
+        }
     }
 
     /**
@@ -79,9 +119,18 @@ public:
      * 
      * @return vector of keys.
      */
-    std::vector<K> keys()
+    std::vector<K> keys() const
     {
-        return {};
+        std::vector<K> result;
+        // Vi allokerer plads i forvejen for effektivitetens skyld, da vi kender antallet.
+        result.reserve(data.size());
+        
+        // Gennemløb alle par i ordbogen
+        for (const auto& pair : data) {
+            // Udtræk kun nøglen (pair.first) og put den i resultat-vektoren
+            result.push_back(pair.first);
+        }
+        return result; // Returnér vektoren fyldt med nøgler
     }
 
     /**
@@ -89,8 +138,16 @@ public:
      * 
      * @return vector of values.
      */
-    std::vector<V> values()
+    std::vector<V> values() const
     {
-        return {};
+        std::vector<V> result;
+        // Vi allokerer plads i forvejen.
+        result.reserve(data.size());
+        
+        for (const auto& pair : data) {
+            // Udtræk kun værdien (pair.second) og put den i resultat-vektoren
+            result.push_back(pair.second);
+        }
+        return result; // Returnér vektoren fyldt med værdier
     }
 };
