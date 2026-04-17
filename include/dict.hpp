@@ -32,9 +32,9 @@ public:
     {
         // Vi kører igennem alle par i vores data-vektor (som referencer for at kunne ændre dem).
         for (auto& pair : data) {
-            // Hvis vi finder et par, hvor nøglen (pair.first) allerede findes...
+            // Hvis vi finder et par, hvor nøglen (pair.first) allerede findes -
             if (pair.first == key) {
-                // ...så overskriver vi bare værdien (pair.second) med den nye.
+                // - så overskriver vi bare værdien (pair.second) med den nye.
                 pair.second = val;
                 return; // Afslut funktionen herindefra
             }
@@ -53,8 +53,7 @@ public:
      */
     bool has(K key) const
     {
-        // std::any_of er en genvej til at lede efter noget i en liste.
-        // Den returnerer 'true' hvis betingelsen i lambda-funktionen er sand for mindst ét element.
+     
         return std::any_of(data.begin(), data.end(), [&key](const auto& pair) {
             return pair.first == key; // Sammenligner nøglen med eksisterende nøgler
         });
@@ -87,7 +86,7 @@ public:
                 return pair.second; // Returner dens tilhørende værdi.
             }
         }
-        // Hvis vi når hertil, fandtes nøglen ikke. Så returnerer vi std::nullopt (viser at der ingen værdi er).
+        // Hvis vi når hertil, fandtes nøglen ikke. Så returnerer vi std::nullopt.
         return std::nullopt;
     }
 
@@ -101,8 +100,7 @@ public:
      */
     void del(K key)
     {
-        // std::remove_if flytter alle de elementer der matcher (vores søgte nøgle) 
-        // bagest i vektoren og returnerer en iterator (en slags markør) til starten af dem.
+        
         auto it = std::remove_if(data.begin(), data.end(), [&key](const auto& pair) {
             return pair.first == key;
         });
